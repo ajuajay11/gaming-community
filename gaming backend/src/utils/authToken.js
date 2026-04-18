@@ -29,4 +29,14 @@ function verifyToken(token, options = {}) {
   return jwt.verify(token, process.env.JWT_SECRET, options);
 }
 
-module.exports = { setAuthCookie, verifyToken };
+const cookieBase = {
+  path: "/",
+  sameSite: "lax",
+};
+
+function clearAuthCookies(res) {
+  res.clearCookie("token", { ...cookieBase, httpOnly: true });
+  res.clearCookie("auth", { ...cookieBase, httpOnly: false });
+}
+
+module.exports = { setAuthCookie, verifyToken, clearAuthCookies };
