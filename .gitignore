@@ -6,6 +6,8 @@ node_modules/
 .env
 .env.*
 !.env.example
+# Explicit: backend folder name contains a space
+gaming backend/.env
 
 # Logs & OS
 *.log
