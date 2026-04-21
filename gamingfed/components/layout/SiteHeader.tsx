@@ -61,7 +61,7 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
               href="/login"
               className="whitespace-nowrap rounded-lg bg-black px-3 py-2 text-xs font-semibold text-white dark:bg-white dark:text-black sm:px-4 sm:text-sm"
             >
-              {t("signIn")}
+              {t("signIn")} 
             </Link>
           )}
         </div>
