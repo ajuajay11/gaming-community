@@ -1,9 +1,16 @@
-// Export shared services here, e.g.
-// module.exports.otpService = require("./otp.service");
-const { uploadToS3, deleteFromS3 } = require("./uploadToS3");
+const {
+    uploadToAzure,
+    deleteFromAzure,
+    deleteManyFromAzure,
+    keyFromLocationUrl,
+    collectImageKeys,
+} = require("./azureBlob");
 
 module.exports = {
     generateOtpService: require("./generateOtp"),
-    uploadToS3,
-    deleteFromS3,
+    uploadToAzure,
+    deleteFromAzure,
+    deleteManyFromAzure,
+    keyFromLocationUrl,
+    collectImageKeys,
 };

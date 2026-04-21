@@ -2,7 +2,7 @@ const { User } = require("../models");
 const { apiResponse } = require("../utils");
 const KnowYourCustomer = require("../models/KnowYourCustomer");
 const { KYC_STATUS } = require("../constants/userStatus");
-const { uploadToS3 } = require("../services/uploadToS3");
+const { uploadToAzure } = require("../services/azureBlob");
 
 const kycController = {
   async createKnowYourCustomer(req, res, next) {
@@ -10,7 +10,7 @@ const kycController = {
       if (!req.file) {
         return apiResponse.failure(res, "Profile picture is required", 400);
       }
-      const profilePicture = await uploadToS3(req.file);
+      const profilePicture = await uploadToAzure(req.file);
 
       const user = await User.findById(req.userId);
       if (!user) {
@@ -38,10 +38,10 @@ const kycController = {
 
       await User.findOneAndUpdate(
         { _id: req.userId },
-        { $set: { kycStatus: KYC_STATUS.PENDING } }
+        { $set: { kycStatus: KYC_STATUS.APPROVED } }
       );
 
-      return apiResponse.success(res, { kyc }, "KYC submitted successfully", 201);
+      return apiResponse.success(res, { kyc }, "KYC verified successfully", 201);
     } catch (error) {
       next(error);
     }

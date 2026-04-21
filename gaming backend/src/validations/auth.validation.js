@@ -1,11 +1,13 @@
 const Joi = require("joi");
 
+const passwordSchema = Joi.string().min(8).required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/);
 const registerSchema = Joi.object({
     email: Joi.string().email().pattern(/^\S+@\S+\.\S+$/),
     phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/),
-    password: Joi.string().min(8).required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
-,
-    role: Joi.string().valid("artist", "organisation", "admin").required(),
+    password: passwordSchema,
+    // Controller only accepts these two — keep Joi in lock-step so we don't
+    // lie to the client about which roles are actually permitted.
+    role: Joi.string().valid("gamer", "admin").default("gamer"),
 }).xor("email", "phone").required();
 
 const generateOtpSchema = Joi.object({
@@ -24,8 +26,7 @@ const verifyOtpSchema = Joi.object({
 const loginSchema = Joi.object({
     email: Joi.string().email().pattern(/^\S+@\S+\.\S+$/),
     phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/),
-    password: Joi.string().min(8).required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
-,
+    password: passwordSchema,
 }).xor("email", "phone").required();
 
 const loginWithOtpSchema = Joi.object({
@@ -38,8 +39,7 @@ const loginWithOtpSchema = Joi.object({
 const resetPasswordSchema = Joi.object({
     email: Joi.string().email(),
     phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/),
-    newPassword: Joi.string().min(8).required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
-,
+    newPassword: passwordSchema,
 }).xor("email", "phone").required();
 
 /** Optional password when the account has a password (email/phone login). */

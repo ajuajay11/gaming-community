@@ -7,44 +7,356 @@
 @theme {
   --color-primary: #000000;
   --color-secondary: #ffffff;
+
+  /* ------------------------------------------------------------------
+     Brand palette — locked to the KG (Kerala Gaming) logo:
+       cyan (accent) + charcoal/steel (surfaces) + white (text).
+     No purple/violet/indigo/pink anywhere in the UI — those are banned
+     from the theme. Semantic colours (red/amber/green) are only
+     allowed for functional states (errors, warnings, success/sold).
+
+     Use these CSS vars, or the matching Tailwind tokens
+     (cyan-*, slate-*), rather than hex literals.
+     ------------------------------------------------------------------ */
+  --brand-cyan-light: #67e8f9;    /* cyan-300 — hover/highlight */
+  --brand-cyan: #22d3ee;          /* cyan-400 — default accent */
+  --brand-cyan-deep: #06b6d4;     /* cyan-500 — pressed/strong */
+  --brand-cyan-darker: #0e7490;   /* cyan-700 — gradient end */
+
+  --brand-steel-light: #cbd5e1;   /* slate-300 */
+  --brand-steel: #64748b;         /* slate-500 */
+  --brand-charcoal: #1e293b;      /* slate-800 */
+  --brand-space: #0a0b0d;         /* body background */
+
+  /* Signature sweep — pale cyan → cyan → deep teal. No purple. */
+  --brand-gradient: linear-gradient(135deg, #67e8f9 0%, #22d3ee 50%, #0e7490 100%);
+  --brand-gradient-soft: linear-gradient(
+    135deg,
+    rgba(103, 232, 249, 0.16) 0%,
+    rgba(34, 211, 238, 0.12) 50%,
+    rgba(14, 116, 144, 0.10) 100%
+  );
+
+  /* Semantic UI — map to CSS vars set on :root / html.dark (see below). */
+  --color-app-fg: var(--app-fg);
+  --color-app-fg-secondary: var(--app-fg-secondary);
+  --color-app-fg-muted: var(--app-fg-muted);
+  --color-app-fg-subtle: var(--app-fg-subtle);
+  --color-app-card: var(--app-card);
+  --color-app-card-muted: var(--app-card-muted);
+  --color-app-border: var(--app-border);
 }
- 
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero load + scroll reveals (replaces Motion for landing). Lenis handles
+   smooth scrolling in SmoothScroll provider.
+   --------------------------------------------------------------------------- */
+@keyframes hero-header-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -1.25rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.hero-header--enter {
+  animation: hero-header-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal--fade-up {
+  transform: translate3d(0, 2.25rem, 0);
+}
+
+.scroll-reveal--fade-down {
+  transform: translate3d(0, -2.25rem, 0);
+}
+
+.scroll-reveal--slide-left {
+  transform: translate3d(-2.75rem, 0, 0);
+}
+
+.scroll-reveal--slide-right {
+  transform: translate3d(2.75rem, 0, 0);
+}
+
+.scroll-reveal--scale-in {
+  transform: scale(0.94);
+  filter: blur(6px);
+}
+
+.scroll-reveal.scroll-reveal--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: none;
+}
+
+.dia-text-reveal.dia-text-reveal--width-anim {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dialog-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dialog-animate-backdrop {
+  animation: dialog-backdrop-in 0.2s ease forwards;
+}
+
+.dialog-animate-panel {
+  animation: dialog-panel-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+
+  .scroll-reveal.scroll-reveal--visible {
+    transform: none !important;
+  }
+
+  .hero-header--enter {
+    animation: none !important;
+  }
+
+  .dia-text-reveal.dia-text-reveal--width-anim {
+    transition: none !important;
+  }
+}
+
+/* Brand gradient sweep (background). Apply to any surface that should carry
+ * the hero's purple→cyan identity. */
+@utility brand-gradient {
+  background-image: var(--brand-gradient);
+}
+
+/* Brand gradient applied to text (for headlines, highlight words). */
+@utility brand-text {
+  background-image: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Softer brand-tinted surface — good for section backgrounds that should
+ * read as part of the brand without competing with the hero. */
+@utility brand-surface {
+  background-image: var(--brand-gradient-soft);
+}
+
+/* Light-mode defaults; overridden under html.dark. */
+:root {
+  --app-fg: #111114;
+  --app-fg-secondary: #334155;
+  --app-fg-muted: #64748b;
+  --app-fg-subtle: #94a3b8;
+  --app-card: #ffffff;
+  --app-card-muted: #f8fafc;
+  --app-border: rgb(226 232 240);
+}
 
 html,
 body {
-  background: #05030f;
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  /* Defaults (light mode). `.dark` override below flips these. */
+  background: #f7f7fb;
+  color: #111114;
+  font-family: var(--font-body), 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;  margin: 0;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+}
+
+/* Sticky-footer pattern: every page's <main> (direct child of <body>, since
+ * AuthProvider is a pure React context and renders no DOM wrapper) grows to
+ * fill the viewport. This guarantees short pages still hit 100vh and keeps
+ * the footer anchored to the bottom instead of floating mid-screen. */
+body > main {
+  flex: 1 0 auto;
+}
+
+html.dark,
+html.dark body {
+  /*
+   * Dark charcoal with two very subtle cyan radial accents. Keeps the
+   * marketplace feeling "alive" without introducing any other hue — the
+   * entire page stays within the KG logo palette.
+   */
+  background:
+    radial-gradient(
+      1200px 600px at 15% -10%,
+      rgba(34, 211, 238, 0.14),
+      transparent 60%
+    ),
+    radial-gradient(
+      1000px 500px at 85% 10%,
+      rgba(103, 232, 249, 0.08),
+      transparent 60%
+    ),
+    #0a0b0d;
+  background-attachment: fixed;
+  color: #ffffff;
+}
+
+html.dark {
+  --app-fg: #ffffff;
+  --app-fg-secondary: #e2e8f0;
+  --app-fg-muted: #94a3b8;
+  --app-fg-subtle: #64748b;
+  --app-card: rgba(255, 255, 255, 0.03);
+  --app-card-muted: rgba(255, 255, 255, 0.02);
+  --app-border: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   TYPOGRAPHY — single source of truth.
+   Headings h1..h6 share --font-display (Geist) + fluid clamp sizes.
+   Paragraphs use --font-body (Inter) with comfortable line-height.
+   :where() keeps specificity at 0 so any Tailwind text- or font- utility
+   class on the element still wins. Raw heading/paragraph tags get the
+   right look automatically without per-element Tailwind overrides.
+   ============================================ */
+
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display), 'Geist', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin: 0;
+  color: inherit;
+}
+
+:where(h1) {
+  font-size: clamp(2rem, 1.2rem + 3.2vw, 3.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+:where(h2) {
+  font-size: clamp(1.5rem, 1.05rem + 2.1vw, 2.5rem);
+  letter-spacing: -0.02em;
+}
+:where(h3) {
+  font-size: clamp(1.25rem, 1.05rem + 1vw, 1.875rem);
+}
+:where(h4) {
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
+}
+:where(h5) {
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  font-weight: 700;
+}
+:where(h6) {
+  font-size: clamp(0.875rem, 0.85rem + 0.2vw, 1rem);
+  font-weight: 700;
+}
+
+:where(p) {
+  font-family: var(--font-body), 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  font-size: clamp(0.875rem, 0.84rem + 0.15vw, 1rem);
+  line-height: 1.55;
+  margin: 0;
+}
+
+:where(li, label, input, textarea, select, button) {
+  font-family: inherit;
+}
+
+/* Smooth out the radial view-transition that AnimatedThemeToggler triggers. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 /* ============================================
      MAIN CONTAINER & SECTIONS
      ============================================ */
 
+/*
+ * One canonical container width across the whole app. Header, footer, main,
+ * hero, etc. all opt in via `className="container mx-auto"`, so every page
+ * reads the same content column on desktop regardless of which route owns
+ * the layout. Tailwind v4's `container` utility has no built-in max-width,
+ * so we supply it here.
+ */
+.container {
+  width: 100%;
+  max-width: 1400px; /* 1280px — marketplace-friendly reading width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Mobile bottom nav is fixed, so <main> needs breathing room below. */
 main.container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 1rem;
-  padding-top: 1rem;
   padding-bottom: 7rem;
+}
+
+@media (min-width: 768px) {
+  main.container {
+    padding-bottom: 3rem;
+  }
 }
 
 section.hero {
   position: relative;
   overflow: hidden;
   border-radius: 1.5rem;
+  /* Charcoal-to-deep-teal sweep, fully on-brand. The tiny cyan
+   * tint at the top matches the logo's electric-cyan highlight. */
   background: linear-gradient(to bottom,
-      #1a0d3a 0%,
-      #0f0a28 50%,
-      #05030f 100%);
+      #0e1a22 0%,
+      #0b1217 50%,
+      #07090c 100%);
   padding: 1.25rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 25px 50px -26px rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(34, 211, 238, 0.18);
 }
 
 /* ============================================
@@ -56,17 +368,14 @@ section.hero {
   padding-top: 0.5rem;
 }
 
-.hero-header h2 {
-  font-size: 2.25rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+/* Primary hero wordmark — uses global :where(h1) clamp sizing. */
+.hero-header h1 {
   color: #ffffff;
-  text-shadow: 0 0 12px rgba(0, 200, 255, 0.25);
-  margin: 0;
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.32);
 }
 
-.hero-header h2 .gradient-text {
-  background: linear-gradient(to right, #06b6d4, #3b82f6);
+.hero-header h1 .gradient-text {
+  background: linear-gradient(to right, #67e8f9, #22d3ee);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -90,11 +399,11 @@ section.hero {
 }
 
 .hero-subheader .divider-left {
-  background: linear-gradient(to right, transparent, #c084fc);
+  background: linear-gradient(to right, transparent, #22d3ee);
 }
 
 .hero-subheader .divider-right {
-  background: linear-gradient(to left, transparent, #c084fc);
+  background: linear-gradient(to left, transparent, #22d3ee);
 }
 
 /* ============================================
@@ -113,7 +422,7 @@ section.hero {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 9rem;
+  height: 13rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -136,25 +445,29 @@ section.hero {
   z-index: 1;
 }
 
-/* Individual game glow colors */
+/*
+ * Per-game glows — all within the KG palette. We vary intensity + tint
+ * (light cyan vs. deep teal vs. steel) so each character still reads as
+ * distinct, but the page stays mono-chromatic on-brand.
+ */
 .game-item.gta-v .glow {
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(103, 232, 249, 0.28) 0%, transparent 70%);
 }
 
 .game-item.pubg .glow {
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.28) 0%, transparent 70%);
 }
 
 .game-item.valorant .glow {
-  background: radial-gradient(circle, rgba(248, 113, 113, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.28) 0%, transparent 70%);
 }
 
 .game-item.free-fire .glow {
-  background: radial-gradient(circle, rgba(251, 146, 60, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(14, 116, 144, 0.32) 0%, transparent 70%);
 }
 
 .game-item.football .glow {
-  background: radial-gradient(circle, rgba(74, 222, 128, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(148, 163, 184, 0.24) 0%, transparent 70%);
 }
 
 .game-item .game-name {
@@ -170,7 +483,7 @@ section.hero {
 
 .game-item.gta-v .game-name {
   left: 0.75rem;
-  color: #a855f7;
+  color: #67e8f9;
 }
 
 .game-item.pubg .game-name {
@@ -180,26 +493,40 @@ section.hero {
 
 .game-item.valorant .game-name {
   left: 0.75rem;
-  color: #f87171;
+  color: #06b6d4;
 }
 
 .game-item.free-fire .game-name {
   right: 0.75rem;
-  color: #fb923c;
+  color: #0e7490;
 }
 
 .game-item.football .game-name {
   left: 0.75rem;
-  color: #4ade80;
+  color: #cbd5e1;
 }
 
-.game-item img {
-  position: relative;
-  z-index: 10;
-  height: 8rem;
-  width: auto;
+/* Full-bleed art inside each column (Next/Image fill). */
+.game-item-media {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.game-item-media .game-thumb {
+  position: absolute;
+  height: 100%;
+  width: 100%;
   object-fit: contain;
+  object-position: center bottom;
   filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6));
+}
+
+/* Wide trio poster: cover fills column height like the tall character PNGs (slight vertical crop). */
+.game-item-media .game-thumb--poster {
+  object-fit: cover;
+  object-position: center 28%;
 }
 
 /* ============================================
@@ -212,10 +539,7 @@ section.hero {
 }
 
 .hero-footer h3 {
-  font-size: 1.5rem;
-  font-weight: 800;
   color: #ffffff;
-  margin: 0;
 }
 
 .hero-footer p {
@@ -256,12 +580,21 @@ section.hero {
   opacity: 0.9;
 }
 
+/*
+ * Primary CTA (Buy) — bright cyan sweep.
+ * Secondary CTA (Sell) — dark steel with a cyan edge, so both buttons stay
+ * in-palette but remain visually distinct (primary vs. ghost).
+ */
 .hero-button.buy-btn {
-  background: linear-gradient(to right, #06b6d4, #3b82f6);
+  background: linear-gradient(to right, #67e8f9, #06b6d4);
+  color: #0a0b0d;
 }
 
 .hero-button.sell-btn {
-  background: linear-gradient(to right, #a855f7, #4f46e5);
+  background: linear-gradient(to right, #1e293b, #0f172a);
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.4) inset,
+    0 10px 15px -3px rgba(0, 0, 0, 0.3);
 }
 
 .hero-button svg {
@@ -274,7 +607,7 @@ section.hero {
      ============================================ */
 
 .feature-cards {
-  margin-top: 1rem;
+  margin-top: 3rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
@@ -282,44 +615,47 @@ section.hero {
 
 .feature-card {
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #0f1114;
+  /* Light-mode defaults: soft surface, near-black text. */
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
   padding: 1rem;
   text-decoration: none;
   color: inherit;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .feature-card:hover {
-  background: #15181e;
+  background: #f4f5f8;
 }
 
 .feature-card.buy-card {
-  border-color: rgba(34, 211, 238, 0.7);
+  border-color: rgba(8, 145, 178, 0.35);
 }
 
+/* Sell card — deep teal, same family as Buy so we stay mono-chromatic. */
 .feature-card.sell-card {
-  border-color: rgba(34, 197, 94, 0.7);
+  border-color: rgba(14, 116, 144, 0.4);
 }
 
 .feature-card .icon {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: #1a1d22;
+  background: #eef2f7;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .feature-card.buy-card .icon {
-  color: #22d3ee;
+  color: #0891b2;
 }
 
 .feature-card.sell-card .icon {
-  color: #22c55e;
+  color: #0e7490;
 }
 
 .feature-card .icon svg {
@@ -329,9 +665,7 @@ section.hero {
 
 .feature-card h4 {
   margin-top: 0.75rem;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .feature-card .card-footer {
@@ -340,18 +674,78 @@ section.hero {
   align-items: center;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #64748b;
 }
 
 .feature-card .card-footer svg {
   width: 1rem;
   height: 1rem;
-  color: #d1d5db;
+  color: #475569;
   transition: transform 0.2s ease;
 }
 
 .feature-card:hover .card-footer svg {
   transform: translateX(0.125rem);
+}
+
+/*
+ * Dark mode: charcoal surfaces with a faint cyan shimmer + matching
+ * border. 100% on-brand with the KG logo (cyan + steel), no stray hues.
+ */
+html.dark .feature-card {
+  border-color: rgba(34, 211, 238, 0.18);
+  background: linear-gradient(
+    135deg,
+    rgba(34, 211, 238, 0.08) 0%,
+    rgba(100, 116, 139, 0.04) 100%
+  ),
+  rgba(15, 17, 20, 0.85);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  backdrop-filter: blur(6px);
+}
+
+html.dark .feature-card:hover {
+  border-color: rgba(34, 211, 238, 0.4);
+  background: linear-gradient(
+    135deg,
+    rgba(34, 211, 238, 0.14) 0%,
+    rgba(100, 116, 139, 0.06) 100%
+  ),
+  rgba(21, 24, 30, 0.9);
+}
+
+html.dark .feature-card.buy-card {
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
+/* Sell card uses a deeper cyan border so it reads as a secondary slot
+ * within the same palette (no purple accent). */
+html.dark .feature-card.sell-card {
+  border-color: rgba(14, 116, 144, 0.6);
+}
+
+html.dark .feature-card .icon {
+  background: #1a1d22;
+}
+
+html.dark .feature-card.buy-card .icon {
+  color: #22d3ee;
+}
+
+html.dark .feature-card.sell-card .icon {
+  color: #67e8f9;
+}
+
+html.dark .feature-card h4 {
+  color: #ffffff;
+}
+
+html.dark .feature-card .card-footer {
+  color: #9ca3af;
+}
+
+html.dark .feature-card .card-footer svg {
+  color: #d1d5db;
 }
 
 /* ============================================
@@ -368,20 +762,8 @@ section.hero {
     padding: 1rem;
   }
 
-  .hero-header h2 {
-    font-size: 1.875rem;
-  }
-
   .game-item {
-    height: 8rem;
-  }
-
-  .game-item img {
-    height: 7rem;
-  }
-
-  .hero-footer h3 {
-    font-size: 1.25rem;
+    height: 11rem;
   }
 
   .feature-cards {
@@ -393,11 +775,97 @@ section.hero {
   }
 }
 
-@media (max-width: 360px) {
-  .hero-header h2 {
-    font-size: 1.5rem;
+/* ============================================
+   DESKTOP — row layout with hover-to-expand
+   ============================================ */
+
+@media (min-width: 768px) {
+  .games-container {
+    flex-direction: row;
+    height: 24rem;
+    gap: 0;
   }
 
+  .game-item {
+    flex: 1 1 0;
+    height: 100%;
+    min-width: 0;
+    border-bottom: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+    cursor: pointer;
+    transition: flex 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .games-container--accordion .game-item {
+    flex: 0.8 1 0;
+  }
+
+  .games-container--accordion .game-item--expanded {
+    flex: 3 1 0;
+  }
+
+  .game-item:last-child {
+    border-right: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .game-item-media .game-thumb {
+    max-width: none;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.55s ease;
+  }
+
+  .game-item--expanded .game-item-media .game-thumb {
+    transform: scale(1.08);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+  }
+
+  .game-item-media .game-thumb--poster {
+    transform-origin: center 35%;
+  }
+
+  .game-item--expanded .game-item-media .game-thumb--poster {
+    transform: scale(1.06);
+  }
+
+  .game-item .glow {
+    opacity: 0.6;
+    transition: opacity 0.55s ease, width 0.55s ease, height 0.55s ease;
+  }
+
+  .game-item--expanded .glow {
+    opacity: 1;
+    width: 18rem;
+    height: 18rem;
+  }
+
+  /* reposition labels to the bottom in row layout */
+  .game-item .game-name {
+    top: auto !important;
+    bottom: 1rem;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    opacity: 0.85;
+    transition: opacity 0.4s ease, font-size 0.4s ease, letter-spacing 0.4s ease;
+  }
+
+  .game-item--expanded .game-name {
+    opacity: 1;
+    font-size: 1.125rem;
+    letter-spacing: 0.2em;
+  }
+
+  /* Centered container on desktop: hero, buttons, cards all share it */
+  main.container {
+    max-width: 1400px;
+
+  }
+}
+
+@media (max-width: 360px) {
   .hero-subheader {
     font-size: 0.5rem;
   }
@@ -405,8 +873,9 @@ section.hero {
   .game-item .game-name {
     font-size: 0.75rem;
   }
+}
 
-  .feature-card h4 {
-    font-size: 1rem;
-  }
+::view-transition-old(root), ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
 }

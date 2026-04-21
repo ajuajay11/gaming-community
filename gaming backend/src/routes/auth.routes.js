@@ -23,6 +23,7 @@ router.post('/google-callback', authController.googleCallback);
 router.post('/google-complete', authController.googleComplete);
 router.get("/me", requireAuth, authController.getMe);
 router.post('/session', requireAuth, authController.session);
+router.post('/logout', authController.logout);
 router.delete(
   '/account',
   requireAuth,

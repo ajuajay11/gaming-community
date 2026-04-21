@@ -34,6 +34,16 @@ const profileSchema = new mongoose.Schema(
       match: /^[a-z0-9_]{3,32}$/,
     },
     locale: { type: String, trim: true, maxlength: 10, default: "en" },
+    /**
+     * Public WhatsApp number for buyers (E.164-ish: optional +, then digits).
+     * Shown on listings only to viewers who completed KYC.
+     */
+    whatsapp: {
+      type: String,
+      trim: true,
+      sparse: true,
+      match: /^\+?[1-9]\d{1,14}$/,
+    },
   },
   { timestamps: true }
 );

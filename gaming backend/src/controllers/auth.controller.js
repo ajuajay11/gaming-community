@@ -1,32 +1,27 @@
 const { User, Profile, Game, KycDocument, UserAchievement } = require("../models");
 const { apiResponse, setAuthCookie, verifyToken, clearAuthCookies } = require("../utils");
 const {
-  deleteManyFromS3,
+  deleteManyFromAzure,
   keyFromLocationUrl,
   collectImageKeys,
-} = require("../services/uploadToS3");
+} = require("../services/azureBlob");
 const bcrypt = require("bcrypt");
 const { generateOtpService } = require("../services");
 const redisClient = require("../config/redis");
 const { ACCOUNT_STATUS, KYC_STATUS } = require("../constants/userStatus");
 const jwt = require("jsonwebtoken");
+const { findUserIdByEmailOrPhone } = require("../utils/phoneLookup");
 
 const authController = {
 
   async generateOtp(req, res, next) {
     try {
       const { email = "", phone = "", purpose = "" } = req.body;
-      const existingUser = await User.findOne({
-        $or: [
-          ...(email ? [{ email: email?.toLowerCase() }] : []),
-          ...(phone ? [{ phone: phone?.trim() }] : []),
-        ],
-      });
-      console.log("existingUser", existingUser);
+      const existingUserId = await findUserIdByEmailOrPhone(User, email, phone);
       if (purpose === "login" || purpose === "forgot-password") {
-        if (!existingUser) return apiResponse.failure(res, "User not found, please register first", 404);
+        if (!existingUserId) return apiResponse.failure(res, "User not found, please register first", 404);
       } else if (purpose === "register") {
-        if (existingUser) return apiResponse.failure(res, `User with this ${email ? "email" : "phone"} already exists`, 400);
+        if (existingUserId) return apiResponse.failure(res, `User with this ${email ? "email" : "phone"} already exists`, 400);
       }
       const prefix =
         purpose === "login"
@@ -49,6 +44,11 @@ const authController = {
       }
       const otp = generateOtpService();
       await redisClient.client.set(key, otp, { EX: 60 * 5 });
+      if (process.env.NODE_ENV !== "production") {
+        // Dev convenience: print the OTP so you can verify flows without
+        // a real email/SMS gateway. Remove before going live.
+        console.log(`[otp:${purpose}] ${email || phone} -> ${otp}`);
+      }
       return apiResponse.success(res, { message: "OTP sent successfully" }, "OTP sent successfully", 200);
     } catch (err) {
       next(err);
@@ -62,6 +62,17 @@ const authController = {
       const isForgotPassword = purpose === "forgot-password";
       const otpPrefix = isForgotPassword ? "otp:forgot-password" : "otp";
       const verifiedPrefix = isForgotPassword ? "verified:forgot-password" : "verified";
+
+      if (!isForgotPassword) {
+        const takenId = await findUserIdByEmailOrPhone(User, email, phone);
+        if (takenId) {
+          return apiResponse.failure(
+            res,
+            `User with this ${email ? "email" : "phone"} already exists`,
+            400,
+          );
+        }
+      }
 
       if (email) {
         const otpKey = `${otpPrefix}:email:${email.toLowerCase()}`;
@@ -100,16 +111,15 @@ const authController = {
       const verified = await redisClient.client.get(verifiedKey);
       if (!verified) return apiResponse.failure(res, "Please verify OTP first or verification has expired.", 400);
 
-      const user = await User.findOne({
-        $or: [
-          ...(email ? [{ email: email.toLowerCase() }] : []),
-          ...(phone ? [{ phone: phone.trim() }] : []),
-        ],
-      }).select("+password");
+      const resetUid = await findUserIdByEmailOrPhone(User, email, phone);
+      const user = resetUid ? await User.findById(resetUid).select("+password") : null;
       if (!user) return apiResponse.failure(res, "User not found", 404);
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await User.updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { password: hashedPassword }, $inc: { sessionVersion: 1 } },
+      );
       await redisClient.client.del(verifiedKey);
 
       return apiResponse.success(res, { message: "Password reset successfully" }, "Password reset successfully", 200);
@@ -121,8 +131,8 @@ const authController = {
   async register(req, res, next) {
     try {
       const { email, phone, password, role } = req.body;
-      const existingUser = await User.findOne({ $or: [{ email: email?.toLowerCase() }, { phone: phone?.trim() }] });
-      if (existingUser) return apiResponse.failure(res, `User with this ${email ? "email" : "phone"} already exists`, 400);
+      const existingUserId = await findUserIdByEmailOrPhone(User, email, phone);
+      if (existingUserId) return apiResponse.failure(res, `User with this ${email ? "email" : "phone"} already exists`, 400);
 
       if (!email && !phone) {
         return apiResponse.failure(res, "Email or phone is required", 400);
@@ -132,8 +142,9 @@ const authController = {
         ? await redisClient.client.get(`verified:email:${email.toLowerCase()}`)
         : null;
 
-      const verifiedPhone = phone
-        ? await redisClient.client.get(`verified:phone:${phone}`)
+      const phoneNorm = phone != null ? String(phone).trim() : "";
+      const verifiedPhone = phoneNorm
+        ? await redisClient.client.get(`verified:phone:${phoneNorm}`)
         : null;
 
       if (!verifiedEmail && !verifiedPhone) {
@@ -146,17 +157,17 @@ const authController = {
       }
       const newUser = await User.create({
         ...(email && { email: email.toLowerCase() }),
-        ...(phone && { phone }),
+        ...(phoneNorm && { phone: phoneNorm }),
         password: hashedPassword,
         role,
         status: ACCOUNT_STATUS.PENDING,
         kycStatus: KYC_STATUS.NOT_SUBMITTED,
         // correct data when email or phone is verified
         ...(email && { emailVerifiedAt: new Date() }),
-        ...(phone && { phoneVerifiedAt: new Date() }),
+        ...(phoneNorm && { phoneVerifiedAt: new Date() }),
       });
       await Profile.create({ user: newUser._id }).catch(() => {});
-      setAuthCookie(res, newUser._id, newUser.role);
+      await setAuthCookie(res, newUser._id, newUser.role);
       return apiResponse.success(res, { userId: newUser._id, email: newUser.email, phone: newUser.phone, role: newUser.role }, "User registered successfully", 201);
     } catch (err) {
       next(err)
@@ -167,12 +178,8 @@ const authController = {
     try {
       const { email, phone, password } = req.body;
 
-      const user = await User.findOne({
-        $or: [
-          ...(email ? [{ email: email.toLowerCase() }] : []),
-          ...(phone ? [{ phone: phone.trim() }] : []),
-        ]
-      }).select("+password +googleId"); // ✅ also select googleId
+      const loginUid = await findUserIdByEmailOrPhone(User, email, phone);
+      const user = loginUid ? await User.findById(loginUid).select("+password +googleId") : null;
 
       // 1. User not found
       if (!user) return apiResponse.failure(res, "User not found", 404);
@@ -191,7 +198,7 @@ const authController = {
       const updates = { lastSeenAt: new Date() };
       await User.updateOne({ _id: user._id }, { $set: updates });
 
-      setAuthCookie(res, user._id, user.role);
+      await setAuthCookie(res, user._id, user.role);
       const userObject = user.toObject();
       delete userObject.password;
       delete userObject.googleId;
@@ -206,7 +213,8 @@ const authController = {
   async loginWithOtp(req, res, next) {
     try {
       const { email, phone, code } = req.body;
-      const user = await User.findOne({ $or: [{ email: email?.toLowerCase() }, { phone: phone?.trim() }] });
+      const otpLoginUid = await findUserIdByEmailOrPhone(User, email, phone);
+      const user = otpLoginUid ? await User.findById(otpLoginUid) : null;
       if (!user) return apiResponse.failure(res, "User not found, please register first", 404);
       if (user.status === ACCOUNT_STATUS.SUSPENDED) return apiResponse.failure(res, "Account suspended", 403);
       if (user.status === ACCOUNT_STATUS.DEACTIVATED) return apiResponse.failure(res, "Account deactivated", 403);
@@ -215,7 +223,7 @@ const authController = {
       if (otp !== code) return apiResponse.failure(res, "Login OTP invalid, please try again", 400);
       const updates = { lastSeenAt: new Date() };
       await User.updateOne({ _id: user._id }, { $set: updates });
-      setAuthCookie(res, user._id, user.role);
+      await setAuthCookie(res, user._id, user.role);
       const userObject = user.toObject();
       delete userObject.password;
       userObject.lastSeenAt = updates.lastSeenAt;
@@ -231,8 +239,7 @@ const authController = {
         // ✅ update lastSeenAt in DB
         await User.updateOne({ _id: req.user._id }, { $set: { lastSeenAt: new Date() } });
 
-        // ✅ use setAuthCookie instead of manual jwt.sign
-        setAuthCookie(res, req.user._id, req.user.role);
+        await setAuthCookie(res, req.user._id, req.user.role);
 
         return res.redirect(process.env.FRONTEND_URL);
       }
@@ -292,7 +299,7 @@ const authController = {
         emailVerifiedAt: email ? new Date() : null,
       });
       await Profile.create({ user: user._id }).catch(() => {});
-      setAuthCookie(res, user._id, user.role);
+      await setAuthCookie(res, user._id, user.role);
       return apiResponse.success(res, { user: user }, "Registration successful", 201);
     } catch (err) {
       next(err);
@@ -365,14 +372,14 @@ const authController = {
 
       const listings = await Game.find({ seller: user._id }).lean();
       for (const listing of listings) {
-        await deleteManyFromS3(collectImageKeys(listing.images));
+        await deleteManyFromAzure(collectImageKeys(listing.images));
       }
       await Game.deleteMany({ seller: user._id });
 
       const kyc = await KycDocument.findOne({ user: user._id }).lean();
       if (kyc?.profilePicture) {
         const key = keyFromLocationUrl(kyc.profilePicture);
-        if (key) await deleteManyFromS3([key]);
+        if (key) await deleteManyFromAzure([key]);
       }
       await KycDocument.deleteMany({ user: user._id });
       await Profile.deleteMany({ user: user._id });
@@ -387,6 +394,26 @@ const authController = {
         "Account deleted successfully",
         200
       );
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async logout(req, res, next) {
+    try {
+      const token = req.cookies?.token;
+      if (token) {
+        try {
+          const decoded = verifyToken(token);
+          if (decoded?.userId) {
+            await User.updateOne({ _id: decoded.userId }, { $inc: { sessionVersion: 1 } }).catch(() => {});
+          }
+        } catch {
+          /* expired / invalid — still clear cookies */
+        }
+      }
+      clearAuthCookies(res);
+      return apiResponse.success(res, { message: "Logged out" }, "Logged out", 200);
     } catch (err) {
       next(err);
     }

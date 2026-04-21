@@ -1,5 +1,6 @@
 const { User, Profile } = require("../models");
 const { apiResponse } = require("../utils");
+const { uploadToAzure, deleteManyFromAzure, collectImageKeys } = require("../services/azureBlob");
 
 /** KYC status codes — surface summary only, not legal fields (those stay on KYC record). */
 function kycSummaryFromUser(kycStatus) {
@@ -44,10 +45,58 @@ const profileController = {
             avatarUrl: profile.avatarUrl,
             username: profile.username,
             locale: profile.locale,
+            whatsapp: profile.whatsapp,
             updatedAt: profile.updatedAt,
           },
         },
         "Profile loaded",
+        200
+      );
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async uploadAvatar(req, res, next) {
+    try {
+      if (!req.file) {
+        return apiResponse.failure(res, "No image file provided", 400);
+      }
+      const user = await User.findById(req.userId);
+      if (!user) {
+        return apiResponse.failure(res, "User not found", 404);
+      }
+
+      const existing = await Profile.findOne({ user: req.userId }).lean();
+      const oldKeys = collectImageKeys(
+        existing?.avatarUrl ? [existing.avatarUrl] : []
+      );
+
+      const uploaded = await uploadToAzure(req.file);
+      if (oldKeys.length) {
+        await deleteManyFromAzure(oldKeys);
+      }
+
+      const profile = await Profile.findOneAndUpdate(
+        { user: req.userId },
+        { $set: { avatarUrl: uploaded.url } },
+        { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
+      );
+
+      return apiResponse.success(
+        res,
+        {
+          profile: {
+            displayName: profile.displayName,
+            bio: profile.bio,
+            avatarUrl: profile.avatarUrl,
+            username: profile.username,
+            locale: profile.locale,
+            whatsapp: profile.whatsapp,
+            updatedAt: profile.updatedAt,
+          },
+        },
+        "Avatar updated",
         200
       );
     } catch (err) {
@@ -63,6 +112,7 @@ const profileController = {
       }
 
       const body = { ...req.body };
+      if (body.whatsapp === "") body.whatsapp = null;
       if (body.username !== undefined) {
         const taken = await Profile.findOne({
           username: body.username,
@@ -88,6 +138,7 @@ const profileController = {
             avatarUrl: profile.avatarUrl,
             username: profile.username,
             locale: profile.locale,
+            whatsapp: profile.whatsapp,
             updatedAt: profile.updatedAt,
           },
         },

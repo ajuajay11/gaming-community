@@ -37,6 +37,11 @@ const userSchema = new mongoose.Schema(
     },
     emailVerifiedAt: { type: Date, default: null },
     phoneVerifiedAt: { type: Date, default: null },
+    /**
+     * Incremented on every new login / registration cookie issue. Embedded in JWT
+     * as `sv` so only the latest session is valid (single active device).
+     */
+    sessionVersion: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

@@ -8,6 +8,10 @@ const updateProfileSchema = Joi.object({
   avatarUrl: Joi.string().uri().allow("", null),
   username: Joi.string().pattern(/^[a-z0-9_]{3,32}$/),
   locale: Joi.string().trim().max(10),
+  whatsapp: Joi.string()
+    .trim()
+    .pattern(/^\+?[1-9]\d{1,14}$/)
+    .allow("", null),
 })
   .min(1)
   .messages({ "object.min": "At least one field is required" });

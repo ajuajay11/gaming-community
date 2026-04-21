@@ -1,0 +1,299 @@
+{
+  "nav": {
+    "homeAria": "Kerala Hub home",
+    "searchPlaceholder": "Search PUBG, Valorant, GTA…",
+    "searchAria": "Search games",
+    "toggleTheme": "Toggle theme",
+    "notifications": "Notifications",
+    "profileAlt": "Profile",
+    "signIn": "Sign In",
+    "language": "Language"
+  },
+  "footer": {
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "faq": "FAQ",
+    "copyright": "© {year} Gaming Federation"
+  },
+  "bottomNav": {
+    "home": "Home",
+    "explore": "Explore",
+    "chat": "Chat",
+    "profile": "Profile",
+    "createAria": "Create listing",
+    "chatPrompt": "Sign in to view your messages.",
+    "profilePrompt": "Sign in to access your profile.",
+    "sellPrompt": "Sign in to create a listing."
+  },
+  "loginPrompt": {
+    "title": "Sign in to continue",
+    "defaultMessage": "You need to be signed in to use this feature.",
+    "notNow": "Not now",
+    "signIn": "Sign in"
+  },
+  "hero": {
+    "brandLine": "Kerala Hub —",
+    "diaWord": "trade master",
+    "footerTitle": "Premium Gaming IDs",
+    "footerLine": "Verified • Instant Transfer • 100% Secure"
+  },
+  "showcase": {
+    "gta": "GTA V",
+    "pubg": "PUBG",
+    "football": "FOOTBALL",
+    "valorant": "VALORANT",
+    "freeFire": "FREE FIRE"
+  },
+  "howItWorks": {
+    "eyebrow": "How it works",
+    "titleBefore": "From ",
+    "titleBrand": "browse to payout",
+    "titleAfter": " in 4 steps",
+    "description": "No middlemen, no guesswork. Kerala Hub handles the boring-but-important parts so you can focus on playing.",
+    "steps": [
+      {
+        "title": "1. Browse verified IDs",
+        "copy": "Hand-picked accounts across GTA V, PUBG, Valorant, Free Fire, FIFA and more."
+      },
+      {
+        "title": "2. KYC-cleared sellers",
+        "copy": "Every seller passes identity verification before a listing goes live."
+      },
+      {
+        "title": "3. Chat & inspect",
+        "copy": "Ask for screenshots, rank proof, or a live tour before you commit."
+      },
+      {
+        "title": "4. Safe handover",
+        "copy": "Pay through escrow — funds release the moment you confirm access."
+      }
+    ]
+  },
+  "trending": {
+    "eyebrow": "Trending now",
+    "title": "Hot gaming IDs",
+    "viewAll": "View all"
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Questions, answered",
+    "description": "Everything most players ask before their first trade. Still stuck? Ping us in chat.",
+    "items": [
+      {
+        "q": "Is buying a gaming ID on Kerala Hub actually safe?",
+        "a": "Every seller is KYC-verified and all payments are held in escrow until you confirm a successful handover. If something goes wrong, support steps in within 24 hours."
+      },
+      {
+        "q": "Which games can I buy or sell accounts for?",
+        "a": "GTA V, PUBG, Valorant, Free Fire, FIFA/FC, Call of Duty, Fortnite, Clash of Clans and more. If your game isn't in the catalogue, pick 'Other' in the sell form and we'll curate it."
+      },
+      {
+        "q": "How long does a handover take?",
+        "a": "Most deals wrap in under five minutes once payment clears. The seller transfers credentials, you verify, and escrow releases instantly."
+      },
+      {
+        "q": "What fees does Kerala Hub charge?",
+        "a": "Browsing and chatting are free. We take a small service fee on completed sales only — no surprise charges, no subscriptions."
+      },
+      {
+        "q": "Can I list my account without completing KYC?",
+        "a": "No — verification protects buyers and keeps the marketplace reputable. It takes about two minutes and unlocks listings, payouts and verified-only messaging."
+      },
+      {
+        "q": "What happens if a seller doesn't hand over access?",
+        "a": "File a dispute from the listing chat. Escrow holds the funds, our team reviews the conversation, and you get a full refund if the seller can't deliver."
+      }
+    ]
+  },
+  "homeCta": {
+    "title": "Your next gaming ID is one scroll away.",
+    "description": "Browse 10,000+ verified accounts, or flip your own for instant cash. Kerala Hub handles escrow, identity and payouts so you can just play.",
+    "primary": "Browse the marketplace",
+    "secondary": "List your ID",
+    "eyebrow": "Ready when you are"
+  },
+  "featureCards": {
+    "buyTitle": "Buy Account",
+    "buySubtitle": "Find your dream ID",
+    "sellTitle": "Sell Account",
+    "sellSubtitle": "Get instant cash",
+    "sellPrompt": "Sign in to list your gaming ID for sale."
+  },
+  "auth": {
+    "common": {
+      "emailOrPhone": "Email or phone",
+      "placeholderId": "you@example.com or +91 9876543210",
+      "password": "Password",
+      "passwordTab": "Password",
+      "otpTab": "OTP",
+      "oneTimeCode": "One-time code",
+      "otpPlaceholder": "6-digit code",
+      "passwordPlaceholderNew": "Min. 8 chars, mix of upper/lower/number/special",
+      "passwordPlaceholderDots": "••••••••",
+      "passwordOk": "Looks good.",
+      "passwordRules": "Needs upper + lower + number + special character.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "signInMethodAria": "Sign in method",
+      "send": "Send",
+      "resend": "Resend",
+      "verifyCode": "Verify code",
+      "sendVerificationCode": "Send verification code"
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to buy, sell, and chat with other gamers.",
+      "errNeedIdentifier": "Enter your email or phone.",
+      "errSignInFailed": "Sign in failed.",
+      "otpNeedIdentifierFirst": "Enter your email or phone first.",
+      "otpSent": "Code sent. Check your inbox or SMS.",
+      "otpSendFailed": "Could not send code.",
+      "signInSubmit": "Sign in",
+      "verifySubmit": "Verify & sign in",
+      "forgotLink": "Forgot password?",
+      "createAccount": "Create an account",
+      "metaTitle": "Sign In | Kerala Hub",
+      "metaDescription": "Sign in to your Kerala Hub account.",
+      "registeredBanner": "Account created. Sign in with your new credentials."
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Join Kerala Hub to buy and sell gaming IDs safely.",
+      "stepIdentify": "Identify",
+      "stepVerify": "Verify",
+      "stepPassword": "Password",
+      "sendCode": "Send verification code",
+      "verifyIntroBefore": "Sent a 6-digit code to",
+      "verifyIntroAfter": ".",
+      "differentId": "Use a different email or phone",
+      "createAccount": "Create account",
+      "agreePrefix": "By creating an account you agree to our",
+      "agreeAnd": "and",
+      "terms": "Terms",
+      "privacy": "Privacy Policy",
+      "agreeSuffix": ".",
+      "alreadyHave": "Already have an account?",
+      "signIn": "Sign in",
+      "errNeedIdentifier": "Enter your email or phone.",
+      "errSendCode": "Could not send code.",
+      "codeSent": "Code sent. Enter it below.",
+      "errNeedCode": "Enter the code we sent you.",
+      "errInvalidCode": "Invalid code.",
+      "errPasswordRules": "Password doesn't meet the requirements.",
+      "errCreate": "Could not create account.",
+      "metaTitle": "Create Account | Kerala Hub",
+      "metaDescription": "Create your Kerala Hub gaming account."
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "We'll send a one-time code to verify your account.",
+      "stepIdentify": "Identify",
+      "stepVerify": "Verify",
+      "stepReset": "New password",
+      "differentAccount": "Use a different account",
+      "updatePassword": "Update password",
+      "remembered": "Remembered it?",
+      "backSignIn": "Back to sign in",
+      "errNeedIdentifier": "Enter your email or phone.",
+      "codeSent": "Code sent. Enter it below.",
+      "errSendCode": "Could not send code.",
+      "errNeedCode": "Enter the code sent to you.",
+      "errInvalidCode": "Invalid code.",
+      "errReset": "Could not reset password.",
+      "metaTitle": "Forgot Password | Kerala Hub",
+      "metaDescription": "Reset your Kerala Hub password via OTP."
+    }
+  },
+  "legal": {
+    "backToHome": "Back to home",
+    "lastUpdated": "Last updated:"
+  },
+  "faqPage": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Can't find an answer? Email support@keralahub.gg and we'll get back to you.",
+    "metaTitle": "FAQ | Kerala Hub",
+    "metaDescription": "Frequently asked questions about Kerala Hub.",
+    "items": [
+      {
+        "q": "What is Kerala Hub?",
+        "a": "Kerala Hub is a premium marketplace for gaming IDs, in-game items, currency, and boosting services, with built-in verification and secure transfers."
+      },
+      {
+        "q": "How do I sell a gaming account?",
+        "a": "Create an account, complete KYC verification, click 'Sell ID' on the home screen, and submit your listing with media, details, and price. We review listings for compliance before going live."
+      },
+      {
+        "q": "How is the buyer protected?",
+        "a": "Payments are held in escrow until the buyer confirms the account has been transferred and works as described. If something goes wrong, our support team mediates."
+      },
+      {
+        "q": "How do I reset my password?",
+        "a": "On the login page, choose 'Forgot password', request an OTP to your email or phone, verify it, then set a new password."
+      },
+      {
+        "q": "Why do I need KYC?",
+        "a": "KYC helps prevent fraud and chargebacks, and is required to list an account or withdraw earnings. Your documents are stored securely and never shared without consent."
+      },
+      {
+        "q": "How do I delete my account?",
+        "a": "Go to your profile settings and click 'Delete account'. All listings, KYC records, and profile data are permanently removed, subject to legal retention requirements."
+      },
+      {
+        "q": "What fees does Kerala Hub charge?",
+        "a": "Fees are disclosed before you confirm each transaction. We currently charge a small marketplace fee for successful sales and standard payment processor fees."
+      },
+      {
+        "q": "I can't log in — what do I do?",
+        "a": "Ensure you're using the correct email/phone, try the OTP login option, or contact support@keralahub.gg for help."
+      }
+    ]
+  },
+  "explore": {
+    "metaTitle": "Explore Games | Kerala Hub",
+    "metaDescription": "Browse every listing on Kerala Hub — accounts, skins, in-game currency, items and boosting, mixed across every major title.",
+    "eyebrow": "Explore",
+    "titleBefore": "Everything for ",
+    "titleBrand": "every gamer",
+    "description": "Browse verified accounts, rare skins, in-game currency, items and boosting — mixed across every major title.",
+    "searchPlaceholder": "Search games...",
+    "categoriesAria": "Listing categories",
+    "popularEyebrow": "Popular games",
+    "popularTitle": "Pick a game to dive in",
+    "popularDescription": "Tap any title to see every listing for that game, grouped by category.",
+    "skipToListings": "Skip to listings",
+    "latestEyebrow": "Latest listings",
+    "mixedTitle": "Mixed from every category",
+    "listingsTitleSuffix": " listings",
+    "descSearch": "Showing results for \"{query}\". Clear search to see everything.",
+    "descDefault": "Fresh accounts, skins, currency, items and boosting — updated minute-by-minute.",
+    "emptyListingsQuery": "Nothing matches \"{query}\" in {where}.",
+    "whereAnyCategory": "any category",
+    "emptyListingsNone": "No active listings right now — check back soon.",
+    "emptyListingsCategory": "No {category} listings right now. Try another category.",
+    "emptyListingsHint": "New listings drop every day. Bookmark this page and circle back.",
+    "emptyGlobalTitleQuery": "No games matched",
+    "emptyGlobalTitle": "No listings yet",
+    "emptyGlobalDescQuery": "We couldn't find anything for \"{query}\". Try a different name.",
+    "emptyGlobalDesc": "Check back soon — new listings drop every day.",
+    "categories": {
+      "all": "All",
+      "account": "Accounts",
+      "skin": "Skins",
+      "currency": "Currency",
+      "item": "Items",
+      "boosting": "Boosting"
+    }
+  },
+  "termsPage": {
+    "metaTitle": "Terms & Conditions | Kerala Hub",
+    "metaDescription": "Terms and conditions for using the Kerala Hub gaming marketplace.",
+    "title": "Terms & Conditions",
+    "subtitle": "Please read these terms carefully before using Kerala Hub."
+  },
+  "privacyPage": {
+    "metaTitle": "Privacy Policy | Kerala Hub",
+    "metaDescription": "How Kerala Hub collects, uses, and protects your information.",
+    "title": "Privacy Policy",
+    "subtitle": "How we collect, use, and protect your data."
+  }
+}
